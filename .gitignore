@@ -1,3 +1,5 @@
 todo
 *.vim
 *.exe
+.ignore
+__pycache__
