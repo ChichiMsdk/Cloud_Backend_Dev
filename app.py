@@ -29,7 +29,7 @@
 from fastapi import FastAPI, HTTPException
 
 # @Important: Do we actually _need_ that ?
-# ^^ @Note: Answer -> `fastapi` does so we do. It also does validation and provide error codes
+# ^^ @Note: `fastapi` does so we do. It also does validation and provides error codes
 from pydantic import Field     # @Note: https://docs.pydantic.dev/latest/concepts/fields/
 from pydantic import BaseModel # @Note: https://docs.pydantic.dev/latest/concepts/models/#basic-model-usage
 
@@ -77,6 +77,7 @@ class Notation(BaseModel):
 ###
 # @Globals: -------------------------------------------------------------------#
 ###
+
 # @Important: Attribute used by `uvicorn`, should this really be global ?
 app = FastAPI()
 # @Note: temporary storage, DB should be used 
@@ -126,7 +127,6 @@ def feedback_get(feedback_id: str):
 ###
 
 @app.post("/feedback", response_model=Feedback)
-
 # @Important: Is there a max limit in the dictionary ? What is it ?
 # @ToDo: Implement ring buffer for the feedback dict
 def feedback_create(data: FeedbackCreate) -> Feedback:
