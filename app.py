@@ -38,6 +38,7 @@ class Comment(BaseModel):
 class Feedback(BaseModel):
     id      : str
     note    : Optional[str] = None
+    # @ToDo: Maybe should add some parameter to let people have different min/max values
     rating  : int = Field(ge=1, le=5)
     comments: List[Comment] = []
 
@@ -78,13 +79,6 @@ def http_is_not_found(resource, detail = "Resource"):
 ###
 # @Functions: Get routes functions --------------------------------------------#
 ###
-@app.post("/feedback", response_model=Feedback)
-def feedback_create(data: FeedbackCreate):
-    fb_id            = uuid_str_get()
-    feedback         = Feedback(id = fb_id, note = data.note, rating = data.rating)
-    g_fb_dict[fb_id] = feedback
-    return feedback
-
 @app.get("/feedback", response_model=List[Feedback])
 def feedback_list():
     return list(g_fb_dict.values())
@@ -100,12 +94,21 @@ def feedback_get(feedback_id: str):
 # @Functions: Post routes functions -------------------------------------------#
 ###
 
+# @Important: Is there a max limit in the dictionary ? What is it ?
+# @ToDo: Implement ring buffer for the feedback dict
+@app.post("/feedback", response_model=Feedback)
+def feedback_create(data: FeedbackCreate):
+    fb_id            = uuid_str_get()
+    feedback         = Feedback(id = fb_id, note = data.note, rating = data.rating)
+    g_fb_dict[fb_id] = feedback
+    return feedback
+
 # @Important: This function raises HTTPException
 @app.post("/feedback/{feedback_id}/comments", response_model=Comment)
 def comment_add(feedback_id: str, data: CommentCreate):
     feedback = g_fb_dict.get(feedback_id)
     http_is_not_found(feedback, "Feedback")
-    comment = Comment(id=str(uuid4()), text=data.text)
+    comment = Comment(id=uuid_str_get(), text=data.text)
     feedback.comments.append(comment)
     return comment
 
